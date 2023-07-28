@@ -1,3 +1,25 @@
 body {
-    background-color: lightsteelblue;
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    font-family: 'Raleway', sans-serif;
+    height: 100vh;
+    margin: 0;
+}
+
+header {
+    color: darkgrey;
+    font-size: 6vmin;
+    letter-spacing: 2vmin;
+}
+
+h2 {
+    font-size: 5vmin;
+    color: grey;
+}
+
+div {
+    border: 1px solid black;
+    height: 20px;
+    width: 20px;
 }
