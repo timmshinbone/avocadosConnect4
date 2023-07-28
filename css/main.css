@@ -62,6 +62,7 @@ button {
     border-radius: 2vmin;
     font-size: 4vmin;
     margin-top: 4vmin;
+    margin-bottom: 4vmin;
 }
 
 button:hover {
