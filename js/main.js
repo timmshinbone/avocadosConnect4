@@ -121,7 +121,7 @@ function render() {
     // render our controls
     renderControls()
 }
-// checkforawinner() -> checks for win conditions(horizontal, vertical, diagonal) (we might want multiple functions for this)
+
 // handleDrop -> determines which column, and displays(or calls a render function) for a 'game piece' to be displayed
 // check if a move is valid(maybe)
 // handleDrop is going to be associated with a click event
@@ -130,27 +130,100 @@ function handleDrop(event) {
     // console.log('target of the click \n', event)
     // needs to relate a click to the column selected
     const colIdx = markerEls.indexOf(event.target)
-    console.log('this is colIdx in handleDrop \n', colIdx)
+    // console.log('this is colIdx in handleDrop \n', colIdx)
     // determine if the move is valid, and what to do if it is not
     // we need to assign a value to a specific board element
     const colArr = board[colIdx]
-    console.log('this is colArr', colArr)
+    // console.log('this is colArr', colArr)
     // indexOf returns the first thing it encounters(when we use 0 as the argument)
     const rowIdx = colArr.indexOf(0)
     // if the move is invalid, exit the function
     if (rowIdx === -1) return
-    console.log('this is rowidx', rowIdx)
+    // console.log('this is rowidx', rowIdx)
     // assign a value using these two variabls(colArr, rowIdx)
     colArr[rowIdx] = turn
     // change the turn after things have happened
     turn *= -1
-    ////////////////////////////////////
-    // 
+
     // check for a winner
-    // 
-    /////////////////////////////////////
+    winner = getWinner(colIdx, rowIdx)
+    
     // render the changes to the board
     render()
+}
+
+// checkforawinner() -> checks for win conditions(horizontal, vertical, diagonal) (we might want multiple functions for this)
+
+// break check for winner up into different steps
+//  -> checkAdjacentTiles
+function countAdjacent(colIdx, rowIdx, colOffset, rowOffset) {
+    const player = board[colIdx][rowIdx]
+    let count = 0
+
+    // use a while loop to check the spaces around the played tile
+    colIdx += colOffset
+    rowIdx += rowOffset
+    // we need to keep within the board
+    // and only count if the disc matches the player
+    while (
+        board[colIdx] !== undefined && 
+        board[colIdx][rowIdx] !== undefined &&
+        board[colIdx][rowIdx] === player
+    ) {
+        count++
+        colIdx += colOffset
+        rowIdx += rowOffset
+    }
+    console.log('the count in countAdj', count)
+    return count
+}
+// checkForHorizontalWin
+function checkHorizontalWinner(colIdx, rowIdx) {
+    // going to the left
+    const adjCountLeft = countAdjacent(colIdx, rowIdx, -1, 0)
+    // going to the right
+    const adjCountRight = countAdjacent(colIdx, rowIdx, 1, 0)
+
+    return adjCountLeft + adjCountRight >= 3 ? board[colIdx][rowIdx] : null
+}
+// checkForVerticalWin
+function checkVerticalWinner(colIdx, rowIdx) {
+    // go from N to S
+    // 0 = not changing our column
+    // -1 = moving south down the column
+    return countAdjacent(colIdx, rowIdx, 0, -1) === 3 ? board[colIdx][rowIdx] : null
+}
+// checkForDiagonalWin --> two directions to check NWSE & NESW
+function checkDiagonalWinNWSE(colIdx, rowIdx) {
+    // we'll use countAdjacent and move our row and column this time
+    // go NW
+    const adjCountNW = countAdjacent(colIdx, rowIdx, -1, 1)
+    // go SE
+    const adjCountSE = countAdjacent(colIdx, rowIdx, 1, -1)
+
+    return adjCountNW + adjCountSE >= 3 ? board[colIdx][rowIdx] : null
+}
+
+function checkDiagonalWinNESW(colIdx, rowIdx) {
+        // we'll use countAdjacent and move our row and column this time
+    // go NW
+    const adjCountNE = countAdjacent(colIdx, rowIdx, 1, 1)
+    // go SE
+    const adjCountSW = countAdjacent(colIdx, rowIdx, -1, -1)
+
+    return adjCountNE + adjCountSW >= 3 ? board[colIdx][rowIdx] : null
+}
+// call all of these with one big check a winner function
+function getWinner(colIdx, rowIdx) {
+    console.log('this is rowidx - in getWinner', rowIdx)
+    console.log('this is colidx - in getWinner', colIdx)
+    console.log('this is the board', board)
+    return (
+        checkVerticalWinner(colIdx, rowIdx) || 
+        checkHorizontalWinner(colIdx, rowIdx) ||
+        checkDiagonalWinNESW(colIdx, rowIdx) ||
+        checkDiagonalWinNWSE(colIdx, rowIdx)
+    )
 }
 
 
@@ -159,3 +232,4 @@ function handleDrop(event) {
 // click on a marker
 document.getElementById('markers').addEventListener('click', handleDrop)
 // click playAgain button
+playAgainButton.addEventListener('click', init)
