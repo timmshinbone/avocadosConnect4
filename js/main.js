@@ -34,7 +34,7 @@ const markerEls = [...document.querySelectorAll('#markers > div')]
 // things like, initialize the game(set values for our state variables)
 // init() -> will initialize a new game(empty the board)
 init() //called at the very beginning
-
+// this initializes the game with starting values
 function init() {
     // set values for our initial state variables
     turn = 1
@@ -75,18 +75,87 @@ function renderBoard() {
         })
     })
 }
+
+// render controls -> changes the visibility of our play again button
+function renderControls() {
+    // change initial visibility of the button
+    // ask a question ? if true do this : if false do that
+    playAgainButton.style.visibility = winner ? 'visible' : 'hidden'
+    // change visibility of our marker buttons
+    markerEls.forEach((markerEl, colIdx) => {
+        const hideMarker = !board[colIdx].includes(0) || winner
+
+        markerEl.style.visibility = hideMarker ? 'hidden' : 'visible'
+
+    })
+}
+
+// render message based on whose turn it is
+function renderMessage() {
+    // message is a tie
+    if (winner === 'T') {
+        messageEl.innerText = "It's a Tie!!!!!"
+    // message the winner
+    } else if (winner) {
+        messageEl.innerHTML = `
+            <span style="color: ${COLORS[winner]}">
+                ${COLORS[winner].toUpperCase()}
+            </span> Wins!
+        `
+    // message the current turn
+    } else {
+        messageEl.innerHTML = `
+            <span style="color: ${COLORS[turn]}">
+                ${COLORS[turn].toUpperCase()}
+            </span>'s turn!
+        `
+    }
+}
 // render() -> display changes when they are relevant
 // our render function MIGHT call other, more specific render functions (like for the board, messages, etc)
 function render() {
     // render our board
     renderBoard()
     // render our messages
+    renderMessage()
     // render our controls
+    renderControls()
 }
 // checkforawinner() -> checks for win conditions(horizontal, vertical, diagonal) (we might want multiple functions for this)
-// handleAPlayerChoice -> determines which column, and displays(or calls a render function) for a 'game piece' to be displayed
+// handleDrop -> determines which column, and displays(or calls a render function) for a 'game piece' to be displayed
 // check if a move is valid(maybe)
+// handleDrop is going to be associated with a click event
+// which means we need and event parameter
+function handleDrop(event) {
+    // console.log('target of the click \n', event)
+    // needs to relate a click to the column selected
+    const colIdx = markerEls.indexOf(event.target)
+    console.log('this is colIdx in handleDrop \n', colIdx)
+    // determine if the move is valid, and what to do if it is not
+    // we need to assign a value to a specific board element
+    const colArr = board[colIdx]
+    console.log('this is colArr', colArr)
+    // indexOf returns the first thing it encounters(when we use 0 as the argument)
+    const rowIdx = colArr.indexOf(0)
+    // if the move is invalid, exit the function
+    if (rowIdx === -1) return
+    console.log('this is rowidx', rowIdx)
+    // assign a value using these two variabls(colArr, rowIdx)
+    colArr[rowIdx] = turn
+    // change the turn after things have happened
+    turn *= -1
+    ////////////////////////////////////
+    // 
+    // check for a winner
+    // 
+    /////////////////////////////////////
+    // render the changes to the board
+    render()
+}
 
 
 /*----- event listeners -----*/
 // what events will happen, what should they be attached to, and what functions do they call
+// click on a marker
+document.getElementById('markers').addEventListener('click', handleDrop)
+// click playAgain button
